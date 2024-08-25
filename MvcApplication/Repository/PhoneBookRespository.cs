@@ -117,4 +117,42 @@ public bool DeleteContact(string id)
             connection.Close();
         }
     }
+
+public Contact GetContactById(string id)
+{
+    using (var connection = DAppDbContext.GetConnection())
+    {
+        try
+        {
+            connection.Open();
+
+            var command = new MySqlCommand("SELECT * FROM contacts WHERE id = @id", connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    return new Contact
+                    {
+                        Id = Guid.Parse(reader["id"].ToString()),
+                        Firstname = reader["Firstname"].ToString(),
+                        Lastname = reader["Lastname"].ToString(),
+                        PhoneNumber = reader["PhoneNumber"].ToString()
+                    };
+                }
+            }
+        }
+        catch (MySqlException ex)
+        {
+            throw new Exception("Error find contact by ID", ex);
+        }
+        finally
+        {
+            connection.Close();
+        }
+    }
+
+    return null;
+}
 }
