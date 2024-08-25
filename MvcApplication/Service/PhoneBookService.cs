@@ -1,37 +1,26 @@
 ﻿using Models;
-
 using Repository;
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Reflection;
 
 namespace Service
 {
     public class PhoneBookService
     {
-        PhoneBookRespository _repo;
+        private readonly IPhoneBookRepository _repo;
+
+        //dependency injection
         public PhoneBookService()
         {
-            _repo = new PhoneBookRespository();
+             _repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
 
         public bool DeleteContact(string Id)
         {
-            try
-            {
-                var contacts = _repo.GetContacts();
-                var contactForDelete = contacts.FirstOrDefault(x => x.Id.ToString() == Id);
-                contacts.Remove(contactForDelete);
-                _repo.SaveContact(contacts);
-                return true;
+            if(Id == null){
+                throw new ArgumentException("Invalid ID", nameof(id));
             }
-            catch (System.Exception)
-            {
-                return false;
-            }
+            return _repo.DeleteContact(id);
         }
 
         public Contact GetContactById(string id)
