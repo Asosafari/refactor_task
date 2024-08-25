@@ -37,7 +37,10 @@ namespace MvcApplication.Controllers
         public ActionResult Save(Contact model)
         {
             var result = _service.SaveContact(model);
-            return Json(result, JsonRequestBehavior.AllowGet);
+            if(result == false){
+                return Json(new { message = "Contact with this phone number already exists" }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new { message = "Contact saved successfully" }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult DeleteById(string Id)

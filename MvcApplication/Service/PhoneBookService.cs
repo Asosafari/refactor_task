@@ -4,8 +4,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Service
-{
-    public class PhoneBookService
+public class PhoneBookService
     {
         private readonly IPhoneBookRepository _repo;
 
@@ -46,27 +45,13 @@ namespace Service
 
         public bool SaveContact(Contact model)
         {
-            var contacts = GetContacts();
-
-
-            if (model.Id == Guid.Empty)
-            {
+            var existingContact = _repo.GetContactByPhoneNumber(model.PhoneNumber);
+            if (existingContact != null){
+                return false; // message in controller
+            }else{
                 model.Id = Guid.NewGuid();
-                contacts.Add(model);
+                return _repo.SaveContact(model);
             }
-            else
-            {
-                var contactForEdit = GetContactById(model.Id.ToString());
-                if (contactForEdit!=null)
-                {
-                    contacts.Remove(contactForEdit);
-                    contacts.Add(model);
-                }
-              
-            }
-
-
-            return _repo.SaveContact(contacts);
-        }
+            
     }
 }
