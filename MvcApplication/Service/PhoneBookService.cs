@@ -46,7 +46,7 @@ public class PhoneBookService
         public bool SaveContact(Contact model)
         {
             var existingContact = _repo.GetContactByPhoneNumber(model.PhoneNumber);
-            if (existingContact != null){
+            if (existingContact == null){
                 return false; // message in controller
             }else{
                 model.Id = Guid.NewGuid();
