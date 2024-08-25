@@ -1,65 +1,60 @@
 ﻿using Models;
-
-using Newtonsoft.Json;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Repository;
+using MySql.Data.MySqlClient;
 
 namespace Repository
-{
-    public class PhoneBookRespository
-    {
 
-        string filePath = @"D:\data.json";
+
+{
+    public class PhoneBookRespository : IPhoneBookRepository
+    {
+        
+
         public PhoneBookRespository()
         {
-            if (!System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Create(filePath);
-            }
 
         }
         public List<Contact> GetContacts()
         {
-            var result = new List<Contact>();
+            var contacts = new List<Contact>();
 
-            try
+            using (var connection = DAppDbContext.GetConnection())
             {
-                var fileString = System.IO.File.ReadAllText(filePath);
-                result = JsonConvert.DeserializeObject<List<Contact>>(fileString);
-                if (result == null)
+                try
                 {
-                    result = new List<Contact>();
-                }
-                bool hasInvalidId = false;
-                foreach (var contact in result)
-                {
-                    if (contact.Id == null || contact.Id == Guid.Empty)
+                    connection.Open();
+
+                    var command = new MySqlCommand("SELECT * FROM contacts", connection);
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        hasInvalidId = true;
-                        contact.Id = Guid.NewGuid();
+                        while (reader.Read())
+                        {
+                            Contact contact = new Contact
+                            {
+                                Id = Guid.Parse(reader["id"].ToString()),
+                                Firstname = reader["Firstname"].ToString(),
+                                Lastname = reader["Lastname"].ToString(),
+                                PhoneNumber = reader["PhoneNumber"].ToString()
+                            };
+
+                            contacts.Add(contact);
+                        }
                     }
                 }
-                if (hasInvalidId)
+                catch (MySqlException ex)
                 {
-                    SaveContact(result);
+                    throw new Exception("Error fetching contacts", ex);
                 }
-
+                finally
+                {
+                    connection.Close();
+                }
             }
-            catch (Exception)
-            {
-
-            }
-
-
-            return result;
-
+            return contacts;
         }
 
-        public bool SaveContact(List<Contact> model)
+   public bool SaveContact(List<Contact> model)
         {
 
             try

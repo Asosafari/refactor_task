@@ -1,0 +1,8 @@
+using Repository;
+{
+    public interface IPhoneBookRepository
+    {
+        List<Contact> GetContacts();
+        bool SaveContacts(List<Contact> contacts);
+    }
+}
