@@ -26,13 +26,15 @@ namespace Service
         public Contact GetContactById(string id)
         {
 
-            var contacts = GetContacts();
-            var contact = contacts.FirstOrDefault(x => x.Id.ToString() == id.ToString());
-            return contact;
+            if(Id == null){
+                throw new ArgumentException("Invalid ID", nameof(id));
+            }
+            
+            return _repo.GetContactById(id);
 
             //if (contact == null)
             //{
-            //    return null;
+            //    return null; handel in controller
             //}
             //return contact;
         }
