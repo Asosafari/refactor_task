@@ -28,6 +28,9 @@ namespace MvcApplication.Controllers
         public ActionResult GetContactById(string Id)
         {
             Contact contacts = _service.GetContactById(Id);
+            if(contacts == null){
+                return Json(new { message = "Contact not found" }, JsonRequestBehavior.AllowGet);
+            }
             return Json(contacts, JsonRequestBehavior.AllowGet);
         }
 
