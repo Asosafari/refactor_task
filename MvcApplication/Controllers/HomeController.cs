@@ -15,8 +15,6 @@ namespace MvcApplication.Controllers
         public ActionResult Index()
         {
 
-            //PhoneBookService phoneBookService = new PhoneBookService();
-            //List<Contact> contacts = phoneBookService.GetContacts();
 
             return View( );
         }
@@ -25,7 +23,7 @@ namespace MvcApplication.Controllers
         public ActionResult GetContacts()
         {
             PhoneBookService phoneBookService = new PhoneBookService();
-            List<Contact> contacts = phoneBookService.GetContacts();
+            var contacts = _phoneBookService.GetContacts(); 
             return Json(contacts, JsonRequestBehavior.AllowGet);
         }
 
