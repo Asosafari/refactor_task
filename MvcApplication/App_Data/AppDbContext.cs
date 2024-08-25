@@ -7,6 +7,13 @@ public class DAppDbContext
 
     public static MySqlConnection GetConnection()
     {
-        return new MySqlConnection(connectionString);
+        try
+        {
+            return new MySqlConnection(connectionString);
+        }
+        catch (MySqlException ex)
+        {
+            throw new Exception("Error connecting to database", ex);
+        }
     }
 }
