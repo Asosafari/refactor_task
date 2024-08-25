@@ -53,23 +53,68 @@ namespace Repository
             }
             return contacts;
         }
+    public bool SaveContact(Contact contact)
+{
+    if (contact == null)
+    {
+        throw new ArgumentNullException(nameof(contact));
+    }
 
-   public bool SaveContact(List<Contact> model)
+    using (var connection = DAppDbContext.GetConnection())
+    {
+        try
         {
+            connection.Open();
 
-            try
-            {
-                var stringModel = JsonConvert.SerializeObject(model);
-                System.IO.File.WriteAllText(filePath, stringModel);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            var command = new MySqlCommand(
+                @"INSERT INTO contacts (id, Firstname, Lastname, PhoneNumber) 
+                  VALUES (@id, @Firstname, @Lastname, @PhoneNumber)
+                  ON DUPLICATE KEY UPDATE 
+                  Firstname = @Firstname, Lastname = @Lastname, PhoneNumber = @PhoneNumber", 
+                connection);
 
+            command.Parameters.AddWithValue("@id", contact.Id == Guid.Empty ? Guid.NewGuid() : contact.Id);
+            command.Parameters.AddWithValue("@Firstname", contact.Firstname);
+            command.Parameters.AddWithValue("@Lastname", contact.Lastname);
+            command.Parameters.AddWithValue("@PhoneNumber", contact.PhoneNumber);
 
+            command.ExecuteNonQuery();
         }
+        catch (MySqlException ex)
+        {
+            throw new Exception("Error saving contact", ex);
+        }
+        finally
+        {
+            connection.Close();
+        }
+    }
 
+    return true;
+}    
+
+public bool DeleteContact(string id)
+{
+    using (var connection = DAppDbContext.GetConnection())
+    {
+        try
+        {
+            connection.Open();
+
+            var command = new MySqlCommand("DELETE FROM contacts WHERE id = @id", connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            int result = command.ExecuteNonQuery();
+
+            return result > 0;
+        }
+        catch (MySqlException ex)
+        {
+            throw new Exception("Error deleting contact", ex);
+        }
+        finally
+        {
+            connection.Close();
+        }
     }
 }

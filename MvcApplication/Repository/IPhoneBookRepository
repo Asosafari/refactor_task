@@ -4,5 +4,6 @@ using Repository;
     {
         List<Contact> GetContacts();
         bool SaveContacts(List<Contact> contacts);
+        public bool DeleteContact(string id);
     }
 }
