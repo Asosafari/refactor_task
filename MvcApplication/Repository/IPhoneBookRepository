@@ -6,5 +6,6 @@ using Repository;
         bool SaveContacts(List<Contact> contacts);
         public bool DeleteContact(string id);
         public Contact GetContactById(string id);
+        public Contact GetContactByPhoneNumber(string phoneNumber);
     }
 }

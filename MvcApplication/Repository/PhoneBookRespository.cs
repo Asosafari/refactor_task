@@ -5,11 +5,7 @@ using MySql.Data.MySqlClient;
 namespace Repository
 
 
-{
-    public class PhoneBookRespository : IPhoneBookRepository
-    {
-        
-
+    public class PhoneBookRespository : IPhoneBookRepository {
         public PhoneBookRespository()
         {
 
@@ -154,5 +150,36 @@ public Contact GetContactById(string id)
     }
 
     return null;
+}
+
+public Contact GetContactByPhoneNumber(string phoneNumber)
+{
+    Contact contact = null;
+
+    using (var connection = DAppDbContext.GetConnection())
+    {
+        try{
+             connection.Open();
+            var command = new MySqlCommand("SELECT * FROM contacts WHERE PhoneNumber = @PhoneNumber", connection);
+            command.Parameters.AddWithValue("@PhoneNumber", phoneNumber);
+            using (var reader = command.ExecuteReader())
+            if (reader.Read())
+            {
+                contact = new Contact
+                {
+                    Id = Guid.Parse(reader["id"].ToString()),
+                    Firstname = reader["Firstname"].ToString(),
+                    Lastname = reader["Lastname"].ToString(),
+                    PhoneNumber = reader["PhoneNumber"].ToString()
+                };
+            }
+        }catch(MySqlException ex){
+            throw new Exception("Error find contact by ID", ex);
+        }finally{
+            connection.Close;
+        }
+    }
+    return contact;
+}
 }
 }
