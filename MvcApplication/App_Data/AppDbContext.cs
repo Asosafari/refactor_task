@@ -1,10 +1,12 @@
-public class AppDbContext : DbContext
+using System.Data;
+using MySql.Data.MySqlClient;
+
+public class DAppDbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
-        : base(options)
+    private static readonly string connectionString = "Server=localhost;restdb;Pwd=123456;";
+
+    public static MySqlConnection GetConnection()
     {
+        return new MySqlConnection(connectionString);
     }
-
-    public DbSet<Contact> Employees { get; set; }
-
 }
